@@ -45,7 +45,7 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
     if (dice1 == 1 || dice2 == 1){
       if (dice1 == dice2){
         // double 1's should clear round and entire score for that game
-        scores[activePlayer] = 0;
+        setPlayerScore(0);
       }
       // next player
       nextPlayer();
@@ -61,11 +61,7 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
 // Hold method
 document.querySelector('.btn-hold').addEventListener('click', function(){
   if(gamePlaying){
-    // add current score to global score
-    scores[activePlayer] += roundScore;
-
-    // update UI 
-    document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+    setPlayerScore(scores[activePlayer] + roundScore);
 
     // check if game is won
     if(scores[activePlayer] >= winCondition){
@@ -81,9 +77,15 @@ document.querySelector('.btn-hold').addEventListener('click', function(){
   }
 });
 
+function setPlayerScore(gameScore){
+  scores[activePlayer] = gameScore;
+  document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+}
+
 // Set win condition number other than 100
 document.querySelector('#win-condition').addEventListener('blur', setWinCondition);
 
+// As separate function so we can link to it for "pressing enter" or other times when blur isn't working
 function setWinCondition(){
     winCondition = document.getElementById("win-condition").value;
 }
@@ -102,6 +104,7 @@ function nextPlayer(){
   hideDice();
 }
 
+// Start a new game
 document.querySelector('.btn-new').addEventListener('click', init);
 
 function hideDice(){
