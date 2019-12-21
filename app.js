@@ -43,6 +43,10 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
 
     // 3. update the round score IF rolled number was NOT a 1
     if (dice1 == 1 || dice2 == 1){
+      if (dice1 == dice2){
+        // double 1's should clear round and entire score for that game
+        scores[activePlayer] = 0;
+      }
       // next player
       nextPlayer();
     } else {
