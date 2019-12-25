@@ -51,7 +51,7 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
       nextPlayer();
     } else {
       // add score
-      roundScore += dice1 + dice2
+      roundScore += dice1 + dice2;
       document.querySelector('#current-' + activePlayer).textContent = roundScore;
     }
 
