@@ -1,3 +1,6 @@
+import {TheDice} from 'dice.js';
+console.log(TheDie)
+
 /*
 GAME RULES:
 
@@ -10,8 +13,62 @@ GAME RULES:
 */
 
 var scores, roundScore, activePlayer, winCondition = 100;
+var dice;
+
+function TheDie(die, sides = 6, imageName = 'dice-') {
+  this.die = die;   // ID
+  this.sides = sides;
+  this.imageName = imageName;
+  this.value = this.rollValue();
+}
+
+// Combine random value & displaying image that matches
+TheDie.prototype.rollDie = function(){
+  this.value = this.rollValue();
+  this.displayDie();
+}
+
+// Random value for the dice assigned to object
+TheDie.prototype.rollValue = function() {
+  return Math.floor(Math.random() * this.sides) + 1; 
+}
+
+// Display result of roll on screen
+TheDie.prototype.displayDie = function() {
+  var dieDOM = document.querySelector('.' + this.imageName + this.die);
+  dieDOM.style.display = 'block';
+  dieDOM.src = this.imageName + this.value + '.png';
+}
+
+// Hide die image
+TheDie.prototype.hideDice = function() {
+  document.querySelector('.' + this.imageName + this.die).style.display = 'none';
+}
+
+////////////////
+//  Dice(plural)
+//
+//  Composes individual die
+
+function TheDice(){
+  this.dice = [];
+}
+
+TheDice.prototype.addDice = function (number = 1){
+  for(var i = 1; i <= number; i++){
+    this.dice.push(new TheDie(this.dice.length));
+  }
+}
+
+TheDice.prototype.diceTotal = function (){
+  return this.dice.reduce(function (a, b) { return a + b.value}, 0);
+}
 
 init();
+
+//////////////////////////
+// Rules implementation //
+//////////////////////////
 
 // Roll method being attached to button
 // example of anonymous function, one without name
@@ -19,31 +76,22 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
 
   if(gamePlaying){
 
-    //  1. dice values
-    var dice1 = rollDie();
-    var dice2 = rollDie();
+    // Need to make dice proto or array to call / hold these
+    var dice = new TheDice();
+    dice.addDice(2);
+    console.log(dice.diceTotal());
 
-    doDie(1, dice1); 
-    doDie(2, dice2);
-
-    function rollDie(){
-      return Math.floor(Math.random() * 6) + 1; 
-    }
-
-    function doDie(theDie, dice){
-
-      // Select which dice will be changed
-      var diceDom = document.querySelector('.dice-' + theDie);
-
-      diceDom.style.display = 'block';
-      
-      // Select photo representing the number rolled
-      diceDom.src = 'dice-' + dice + '.png';
-    } 
-
+    // Check all the rules are followed
+    //
+    // Create array of rules
+    // Order dependent?
+    //
+    //
     // 3. update the round score IF rolled number was NOT a 1
-    if (dice1 == 1 || dice2 == 1){
-      if (dice1 == dice2){
+    
+    if (dice.dice.includes(1)){
+      var allOnes = dice.dice.every(die => die == 1);
+      if (allOnes){
         // double 1's should clear round and entire score for that game
         setPlayerScore(0);
       }
@@ -51,7 +99,7 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
       nextPlayer();
     } else {
       // add score
-      roundScore += dice1 + dice2;
+      // roundScore += dice1 + dice2;
       document.querySelector('#current-' + activePlayer).textContent = roundScore;
     }
 
@@ -101,17 +149,11 @@ function nextPlayer(){
   document.querySelector('.player-0-panel').classList.toggle('active');
   document.querySelector('.player-1-panel').classList.toggle('active');
 
-  hideDice();
+  // hideDice();
 }
 
 // Start a new game
 document.querySelector('.btn-new').addEventListener('click', init);
-
-function hideDice(){
-    // hide dice 
-  document.querySelector('.dice-1').style.display = 'none';
-  document.querySelector('.dice-2').style.display = 'none';
-}
 
 function init(){
   // initialize game values
@@ -123,7 +165,7 @@ function init(){
   // set winning total
   document.getElementById('win-condition').value = winCondition;
 
-  hideDice();
+  // hideDice();
 
   // zero displays of scores & dice rolls
   document.getElementById('score-0').textContent = '0';
@@ -142,18 +184,3 @@ function init(){
   document.querySelector('.player-1-panel').classList.remove('active');
   document.querySelector('.player-0-panel').classList.add('active');
 }
-
-// document.querySelector('#current-' + activePlayer).textContent = dice;
-// document.querySelector('#current-' + activePlayer).innerHTML = '<em>' + dice + '</em>';
-// document.querySelector('.dice').style.display = 'none';
-
-
-// Example of callback function
-
-// function btn(){
-//   // do something
-// }
-// btn();
-
-// this btn is a callback function - one called by system or event listener so we drop () at end
-// document.querySelector('.btn-roll').addEventListener('click', btn);
