@@ -27,3 +27,22 @@ TheDie.prototype.displayDie = function() {
 TheDie.prototype.hideDice = function() {
   document.querySelector('.' + this.imageName + this.die).style.display = 'none';
 }
+
+////////////////
+//  Dice(plural)
+//
+//  Composes individual die
+
+export function TheDice(){
+  this.dice = [];
+}
+
+TheDice.prototype.addDice = function (number = 1){
+  for(var i = 1; i <= number; i++){
+    this.dice.push(new TheDie(this.dice.length));
+  }
+}
+
+TheDice.prototype.diceTotal = function (){
+  return this.dice.reduce(function (a, b) { return a + b.value}, 0);
+}
