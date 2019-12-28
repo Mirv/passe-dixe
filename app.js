@@ -74,12 +74,12 @@ GAME RULES:
 */
 
 var scores, roundScore, activePlayer, winCondition = 100;
-var dice;
+var dice = new TheDice();
+dice.addDice(2);
+dice.hideDice();
 
 init();
 
-var dice = new TheDice();
-dice.addDice(2);; // includes is hitting array of objects
 
 //////////////////////////
 // Rules implementation //
@@ -89,12 +89,12 @@ dice.addDice(2);; // includes is hitting array of objects
 // example of anonymous function, one without name
 document.querySelector('.btn-roll').addEventListener('click', function(){
 
-  // roll dice
-  dice.rollDice();
-
   // if active game
   if(gamePlaying){
-  
+    
+    // roll dice
+    dice.rollDice();
+
     // update the round score IF rolled number was NOT a 1
  
     // A single one 
@@ -175,7 +175,7 @@ function init(){
   // set winning total
   document.getElementById('win-condition').value = winCondition;
 
-  // hideDice();
+  hideDice();
 
   // zero displays of scores & dice rolls
   document.getElementById('score-0').textContent = '0';
