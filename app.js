@@ -175,7 +175,7 @@ function init(){
   // set winning total
   document.getElementById('win-condition').value = winCondition;
 
-  hideDice();
+  dice.hideDice();
 
   // zero displays of scores & dice rolls
   document.getElementById('score-0').textContent = '0';
