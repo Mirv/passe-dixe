@@ -1,8 +1,72 @@
-import {TheDie} from 'dice.js';
-import {TheDice} from 'dice.js';
-console.log(TheDie);
-console.log(TheDice);
+function TheDie(die = 1, sides = 6, imageName = 'dice-') {
+  this.die = die;   // ID
+  this.sides = sides;
+  this.imageName = imageName;
+  this.value = this.rollValue();
+}
+// Display result of roll on screen
+TheDie.prototype.displayDie = function() {
+  console.log("text: " + this.imageName);
+  console.log(this.die);
+  var dieDOM = document.querySelector('.' + this.imageName + this.die);
+  console.log('die dom ' + dieDOM);
+  dieDOM.style.display = 'block';
+  dieDOM.src = this.imageName + this.value + '.png';
+}
 
+// Random value for the dice assigned to object
+TheDie.prototype.rollValue = function() {
+  return Math.floor(Math.random() * this.sides) + 1; 
+}
+
+// Combine random value & displaying image that matches
+TheDie.prototype.rollDie = function(){
+  this.value = this.rollValue();
+  // console.log('Context of this inside Die is - ');
+  // console.log(this);
+  this.displayDie();
+}
+
+// Hide die image
+TheDie.prototype.hideDie = function() {
+  document.querySelector('.' + this.imageName + this.die).style.display = 'none';
+}
+
+////////////////
+//  Dice(plural)
+//
+//  Composes individual die
+
+function TheDice(){
+  this.dice = [];
+}
+
+TheDice.prototype.addDice = function (number = 1){
+  for(var i = 1; i <= number; i++){
+    this.dice.push(new TheDie(this.dice.length + 1));
+  }
+}
+
+TheDice.prototype.diceTotal = function (){
+  return this.dice.reduce(function (a, b) { return a + b.value}, 0);
+}
+
+TheDice.prototype.countValues = function (target){
+  // return count of all objects in dice array that have value matching target
+  return this.dice.filter(function(die){ return die.value === target }).length;
+}
+
+TheDice.prototype.allSame = function (el){
+  return this.dice.every(die => die == el);
+}
+
+TheDice.prototype.rollDice = function (){
+  this.dice.forEach(element => element.rollDie());
+}
+
+TheDice.prototype.hideDice = function() {
+  this.dice.forEach(ez => ez.hideDie());
+}
 /*
 GAME RULES:
 
@@ -17,9 +81,10 @@ GAME RULES:
 var scores, roundScore, activePlayer, winCondition = 100;
 var dice;
 
-
-
 init();
+
+var dice = new TheDice();
+dice.addDice(2);; // includes is hitting array of objects
 
 //////////////////////////
 // Rules implementation //
@@ -29,32 +94,28 @@ init();
 // example of anonymous function, one without name
 document.querySelector('.btn-roll').addEventListener('click', function(){
 
+  // roll dice
+  dice.rollDice();
+
+  // if active game
   if(gamePlaying){
+  
+    // update the round score IF rolled number was NOT a 1
+    console.log(dice.countValues(1));
+  
+    // A single one 
+    if (dice.countValues(1) > 0){
 
-    // Need to make dice proto or array to call / hold these
-    var dice = new TheDice();
-    dice.addDice(2);
-    console.log(dice.diceTotal());
-
-    // Check all the rules are followed
-    //
-    // Create array of rules
-    // Order dependent?
-    //
-    //
-    // 3. update the round score IF rolled number was NOT a 1
-    
-    if (dice.dice.includes(1)){
-      var allOnes = dice.dice.every(die => die == 1);
-      if (allOnes){
-        // double 1's should clear round and entire score for that game
+      // Two ones
+      if (dice.countValues(1) > 1){
         setPlayerScore(0);
       }
-      // next player
+
+      // next player - as a 1 means end of turn
       nextPlayer();
     } else {
       // add score
-      // roundScore += dice1 + dice2;
+      roundScore += dice.diceTotal();
       document.querySelector('#current-' + activePlayer).textContent = roundScore;
     }
 
@@ -69,13 +130,13 @@ document.querySelector('.btn-hold').addEventListener('click', function(){
     // check if game is won
     if(scores[activePlayer] >= winCondition){
       document.querySelector('#name-' + activePlayer).textContent = 'Winner';
-      hideDice();
+      dice.hideDice();
       document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
       document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
       gamePlaying = false;
     } else {
       // next player
-      nextPlayer();
+      nextPlayer(dice);
     }
   }
 });
@@ -104,7 +165,7 @@ function nextPlayer(){
   document.querySelector('.player-0-panel').classList.toggle('active');
   document.querySelector('.player-1-panel').classList.toggle('active');
 
-  // hideDice();
+  dice.hideDice();
 }
 
 // Start a new game

@@ -1,4 +1,4 @@
-export function TheDie(die, sides = 6, imageName = 'dice-') {
+function TheDie(die, sides = 6, imageName = 'dice-') {
   this.die = die;   // ID
   this.sides = sides;
   this.imageName = imageName;
