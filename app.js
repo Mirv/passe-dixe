@@ -6,10 +6,7 @@ function TheDie(die = 1, sides = 6, imageName = 'dice-') {
 }
 // Display result of roll on screen
 TheDie.prototype.displayDie = function() {
-  console.log("text: " + this.imageName);
-  console.log(this.die);
   var dieDOM = document.querySelector('.' + this.imageName + this.die);
-  console.log('die dom ' + dieDOM);
   dieDOM.style.display = 'block';
   dieDOM.src = this.imageName + this.value + '.png';
 }
@@ -22,8 +19,6 @@ TheDie.prototype.rollValue = function() {
 // Combine random value & displaying image that matches
 TheDie.prototype.rollDie = function(){
   this.value = this.rollValue();
-  // console.log('Context of this inside Die is - ');
-  // console.log(this);
   this.displayDie();
 }
 
@@ -101,8 +96,7 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
   if(gamePlaying){
   
     // update the round score IF rolled number was NOT a 1
-    console.log(dice.countValues(1));
-  
+ 
     // A single one 
     if (dice.countValues(1) > 0){
 
