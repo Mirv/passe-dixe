@@ -49,7 +49,7 @@ TheDice.prototype.diceTotal = function (){
 
 TheDice.prototype.countValues = function (target){
   // return count of all objects in dice array that have value matching target
-  return this.dice.filter(function(die){ return die.value === target }).length;
+  return this.dice.filter(function(die){ return die.rollResult === target }).length;
 }
 
 TheDice.prototype.allSame = function (el){
@@ -102,9 +102,8 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
     dice.rollDice();
 
     // update the round score IF rolled number was NOT a 1
- 
     // A single one 
-    if (dice.countValues(1) > 0){
+    if (dice.countValues(1) > 0){ 
 
       // Two ones
       if (dice.countValues(1) > 1){
@@ -113,7 +112,7 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
 
       // next player - as a 1 means end of turn
       nextPlayer();
-      
+
     } else {
       // add score
       roundScore += dice.diceTotal();
