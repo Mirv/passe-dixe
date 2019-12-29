@@ -1,31 +1,46 @@
-function TheDie(die = 1, sides = 6, imageName = 'dice-') {
-  this.dieID = die;   // ID
-  this.sides = sides;
-  this.imageName = imageName;
-  this.rollResult = this.rollValue();
-}
-// Display result of roll on screen
-TheDie.prototype.displayDie = function() {
-  var dieDOM = document.querySelector('.' + this.imageName + this.dieID);
-  dieDOM.style.display = 'block';
-  dieDOM.src = this.imageName + this.rollResult + '.png';
+/*
+GAME RULES:
+
+Single Dice
+- The game has 2 players, playing in rounds
+- In each turn, a player rolls a dice as many times as he whishes. Each result get added to his ROUND score
+- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
+- The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
+- The first player to reach 100 points on GLOBAL score wins the game
+
+Double dice
+- Add one extra dice for two
+- If both dice are rolled as 1's, reset the players total score to zero also
+
+*/
+class TheDie {
+  constructor(die = 1, sides = 6, imageName = 'dice-') {
+    this.dieID = die;   // ID
+    this.sides = sides;
+    this.imageName = imageName;
+    this.rollResult = this.rollValue();
+  }
+  displayDie() {
+    // Display result of roll on screen
+    var dieDOM = document.querySelector('.' + this.imageName + this.dieID);
+    dieDOM.style.display = 'block';
+    dieDOM.src = this.imageName + this.rollResult + '.png';
+  }
+  // Random value for the dice assigned to object
+  rollValue() {
+    return Math.floor(Math.random() * this.sides) + 1; 
+  }
+  // Combine random value & displaying image that matches
+  rollDie(){
+    this.rollResult = this.rollValue();
+    this.displayDie();
+  }
+  // Hide die image
+  hideDie() {
+    document.querySelector('.' + this.imageName + this.dieID).style.display = 'none';
+  }
 }
 
-// Random value for the dice assigned to object
-TheDie.prototype.rollValue = function() {
-  return Math.floor(Math.random() * this.sides) + 1; 
-}
-
-// Combine random value & displaying image that matches
-TheDie.prototype.rollDie = function(){
-  this.rollResult = this.rollValue();
-  this.displayDie();
-}
-
-// Hide die image
-TheDie.prototype.hideDie = function() {
-  document.querySelector('.' + this.imageName + this.dieID).style.display = 'none';
-}
 
 ////////////////
 //  Dice(plural)
@@ -63,21 +78,7 @@ TheDice.prototype.rollDice = function (){
 TheDice.prototype.hideDice = function() {
   this.dice.forEach(aDie => aDie.hideDie());
 }
-/*
-GAME RULES:
 
-Single Dice
-- The game has 2 players, playing in rounds
-- In each turn, a player rolls a dice as many times as he whishes. Each result get added to his ROUND score
-- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
-- The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
-- The first player to reach 100 points on GLOBAL score wins the game
-
-Double dice
-- Add one extra dice for two
-- If both dice are rolled as 1's, reset the players total score to zero also
-
-*/
 
 var scores, roundScore, activePlayer, winCondition = 100;
 var dice = new TheDice();
