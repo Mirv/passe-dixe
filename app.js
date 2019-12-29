@@ -13,77 +13,6 @@ Double dice
 - If both dice are rolled as 1's, reset the players total score to zero also
 
 */
-class TheDie {
-  constructor(die = 1, sides = 6, imageName = 'dice-') {
-    this.dieID = die;   // ID
-    this.sides = sides;
-    this.imageName = imageName;
-    this.rollResult = this.rollValue();
-  }
-  // Combine random value & displaying image that matches
-  rollDie(){
-    this.rollResult = this.rollValue();
-    this.displayDie();
-  }
-
-  /////// Note: this really belong in another class
-  
-  // Random value for the dice assigned to object
-  rollValue() {
-    return Math.floor(Math.random() * this.sides) + 1; 
-  }
-  displayDie() {
-    // Display result of roll on screen
-    var dieDOM = document.querySelector('.' + this.imageName + this.dieID);
-    dieDOM.style.display = 'block';
-    dieDOM.src = this.imageName + this.rollResult + '.png';
-  }
-
-
-  // Hide die image
-  hideDie() {
-    document.querySelector('.' + this.imageName + this.dieID).style.display = 'none';
-  }
-}
-
-
-////////////////
-//  Dice(plural)
-//
-//  Composes individual die
-
-function TheDice(){
-  this.dice = [];
-}
-
-TheDice.prototype.addDice = function (number = 1){
-  for(var i = 1; i <= number; i++){
-    this.dice.push(new TheDie(this.dice.length + 1));
-  }
-}
-
-TheDice.prototype.diceTotal = function (){
-  // value of all 
-  return this.dice.reduce(function (a, b) { return a + b.rollResult}, 0);
-}
-
-TheDice.prototype.countValues = function (target){
-  // return count of all objects in dice array that have value matching target
-  return this.dice.filter(function(die){ return die.rollResult === target }).length;
-}
-
-TheDice.prototype.allSame = function (el){
-  return this.dice.every(die => die == el);
-}
-
-TheDice.prototype.rollDice = function (){
-  this.dice.forEach(element => element.rollDie());
-}
-
-TheDice.prototype.hideDice = function() {
-  this.dice.forEach(aDie => aDie.hideDie());
-}
-
 
 var scores, roundScore, activePlayer, winCondition = 100;
 var dice = new TheDice();
@@ -205,4 +134,74 @@ function init(){
   document.querySelector('.player-0-panel').classList.remove('active');
   document.querySelector('.player-1-panel').classList.remove('active');
   document.querySelector('.player-0-panel').classList.add('active');
+}
+
+
+
+///////////////////////
+// Single form of dice
+//
+// Holds values, calls to manipulate the dice dom visually
+class TheDie {
+  constructor(die = 1, sides = 6, imageName = 'dice-') {
+    this.dieID = die;   // ID
+    this.sides = sides;
+    this.imageName = imageName;
+    this.rollResult = this.rollValue();
+  }
+  // Combine random value & displaying image that matches
+  rollDie(){
+    this.rollResult = this.rollValue();
+    this.displayDie();
+  }
+
+  /////// Note: this really belong in another class
+
+  // Random value for the dice assigned to object
+  rollValue() {
+    return Math.floor(Math.random() * this.sides) + 1; 
+  }
+  displayDie() {
+    // Display result of roll on screen
+    var dieDOM = document.querySelector('.' + this.imageName + this.dieID);
+    dieDOM.style.display = 'block';
+    dieDOM.src = this.imageName + this.rollResult + '.png';
+  }
+  hideDie() {
+    document.querySelector('.' + this.imageName + this.dieID).style.display = 'none';
+  }
+}
+
+
+////////////////
+//  Dice(plural)
+//
+//  Composes individual die
+//
+class TheDice {
+  constructor(){
+    this.dice = [];
+  }
+  addDice(number = 1) {
+    for(var i = 1; i <= number; i++){
+      this.dice.push(new TheDie(this.dice.length + 1));
+    }
+  }
+  diceTotal(){
+    // value of all 
+    return this.dice.reduce(function (a, b) { return a + b.rollResult}, 0);
+  }
+  countValues (target){
+    // return count of all objects in dice array that have value matching target
+    return this.dice.filter(function(die){ return die.rollResult === target }).length;
+  }
+  allSame (el){
+    return this.dice.every(die => die == el);
+  }
+  rollDice (){
+    this.dice.forEach(element => element.rollDie());
+  }
+  hideDice () {
+    this.dice.forEach(aDie => aDie.hideDie());
+  }
 }
