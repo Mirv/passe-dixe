@@ -93,12 +93,12 @@ class Player {
 }
 
 class ScoreBoard {
-  construction(numPlayers = 2, windCondition = 50){
+  constructor(numPlayers = 2, winCondition = 50){
     this.roundScore = 0;
     this.activePlayer = 0;
-    this.windCondition = 50;
+    this.winCondition = winCondition;
     this.players = [];
-    this.addPlayers(numPlayers);
+    this.addPlayer(numPlayers);
   }
   addPlayer(howMany = 1){
     for(var i = 0; i < howMany; i++){
@@ -107,8 +107,9 @@ class ScoreBoard {
   }
 }
 
-var scores, roundScore, activePlayer, winCondition = 100;
+var scores, roundScore, activePlayer;
 var scoreboard = new ScoreBoard();
+console.log(scoreboard.winCondition);
 var dice = new TheDice(2);
 // dice.addDice(2);
 // dice.hideDice();
@@ -157,7 +158,7 @@ document.querySelector('.btn-hold').addEventListener('click', function(){
     setPlayerScore(scores[activePlayer] + roundScore);
 
     // check if game is won
-    if(scores[activePlayer] >= winCondition){
+    if(scores[activePlayer] >= scoreboard.winCondition){
       document.querySelector('#name-' + activePlayer).textContent = 'Winner';
       dice.hideDice();
       document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
@@ -180,7 +181,7 @@ document.querySelector('#win-condition').addEventListener('blur', setWinConditio
 
 // As separate function so we can link to it for "pressing enter" or other times when blur isn't working
 function setWinCondition(){
-    winCondition = document.getElementById("win-condition").value;
+    scoreboard.winCondition = document.getElementById("win-condition").value;
 }
 
 function nextPlayer(){
@@ -208,7 +209,7 @@ function init(){
   gamePlaying = true;
 
   // set winning total
-  document.getElementById('win-condition').value = winCondition;
+  document.getElementById('win-condition').value = scoreboard.winCondition;
 
   dice.hideDice();
 
