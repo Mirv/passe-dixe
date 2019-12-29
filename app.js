@@ -14,10 +14,104 @@ Double dice
 
 */
 
+
+//////////////////////////////////////////////////
+// Single form of dice
+//
+// Holds values, calls to manipulate the dom 
+//
+class TheDie {
+  constructor(die = 1, sides = 6, imageName = 'dice-') {
+    this.dieID = die;   // ID
+    this.sides = sides;
+    this.imageName = imageName;
+    this.rollResult = this.rollValue();
+  }
+  // Combine random value & displaying image that matches
+  rollDie(){
+    this.rollResult = this.rollValue();
+    this.displayDie();
+  }
+
+  /////// Note: this really belong in another class
+
+  // Random value for the dice assigned to object
+  rollValue() {
+    return Math.floor(Math.random() * this.sides) + 1; 
+  }
+  displayDie() {
+    // Display result of roll on screen
+    var dieDOM = document.querySelector('.' + this.imageName + this.dieID);
+    dieDOM.style.display = 'block';
+    dieDOM.src = this.imageName + this.rollResult + '.png';
+  }
+  hideDie() {
+    document.querySelector('.' + this.imageName + this.dieID).style.display = 'none';
+  }
+}
+
+
+////////////////
+//  Dice(plural)
+//
+//  Composes individual die
+//
+class TheDice {
+  constructor(howMany){
+    this.dice = []
+    this.addDice(howMany);
+  }
+  addDice(number = 1) {
+    for(var i = 0; i < number; i++){
+      this.dice.push(new TheDie(this.dice.length + 1));
+    }
+  }
+  diceTotal(){
+    // value of all 
+    return this.dice.reduce(function (a, b) { return a + b.rollResult}, 0);
+  }
+  countValues (target){
+    // return count of all objects in dice array that have value matching target
+    return this.dice.filter(function(die){ return die.rollResult === target }).length;
+  }
+  allSame (el){
+    return this.dice.every(die => die == el);
+  }
+  rollDice (){
+    this.dice.forEach(element => element.rollDie());
+  }
+  hideDice () {
+    this.dice.forEach(aDie => aDie.hideDie());
+  }
+}
+
+class Player {
+  constructor(id = 0, score = 0){
+    this.id = id;
+    this.score = score;
+  }
+}
+
+class ScoreBoard {
+  construction(numPlayers = 2, windCondition = 50){
+    this.roundScore = 0;
+    this.activePlayer = 0;
+    this.windCondition = 50;
+    this.players = [];
+    this.addPlayers(numPlayers);
+  }
+  addPlayer(howMany = 1){
+    for(var i = 0; i < howMany; i++){
+      this.players.push(new Player(this.players.length));
+    }
+  }
+}
+
 var scores, roundScore, activePlayer, winCondition = 100;
-var dice = new TheDice();
-dice.addDice(2);
-dice.hideDice();
+var scoreboard = new ScoreBoard();
+var dice = new TheDice(2);
+// dice.addDice(2);
+// dice.hideDice();
 
 init();
 
@@ -136,72 +230,3 @@ function init(){
   document.querySelector('.player-0-panel').classList.add('active');
 }
 
-
-
-///////////////////////
-// Single form of dice
-//
-// Holds values, calls to manipulate the dice dom visually
-class TheDie {
-  constructor(die = 1, sides = 6, imageName = 'dice-') {
-    this.dieID = die;   // ID
-    this.sides = sides;
-    this.imageName = imageName;
-    this.rollResult = this.rollValue();
-  }
-  // Combine random value & displaying image that matches
-  rollDie(){
-    this.rollResult = this.rollValue();
-    this.displayDie();
-  }
-
-  /////// Note: this really belong in another class
-
-  // Random value for the dice assigned to object
-  rollValue() {
-    return Math.floor(Math.random() * this.sides) + 1; 
-  }
-  displayDie() {
-    // Display result of roll on screen
-    var dieDOM = document.querySelector('.' + this.imageName + this.dieID);
-    dieDOM.style.display = 'block';
-    dieDOM.src = this.imageName + this.rollResult + '.png';
-  }
-  hideDie() {
-    document.querySelector('.' + this.imageName + this.dieID).style.display = 'none';
-  }
-}
-
-
-////////////////
-//  Dice(plural)
-//
-//  Composes individual die
-//
-class TheDice {
-  constructor(){
-    this.dice = [];
-  }
-  addDice(number = 1) {
-    for(var i = 1; i <= number; i++){
-      this.dice.push(new TheDie(this.dice.length + 1));
-    }
-  }
-  diceTotal(){
-    // value of all 
-    return this.dice.reduce(function (a, b) { return a + b.rollResult}, 0);
-  }
-  countValues (target){
-    // return count of all objects in dice array that have value matching target
-    return this.dice.filter(function(die){ return die.rollResult === target }).length;
-  }
-  allSame (el){
-    return this.dice.every(die => die == el);
-  }
-  rollDice (){
-    this.dice.forEach(element => element.rollDie());
-  }
-  hideDice () {
-    this.dice.forEach(aDie => aDie.hideDie());
-  }
-}
