@@ -20,21 +20,26 @@ class TheDie {
     this.imageName = imageName;
     this.rollResult = this.rollValue();
   }
+  // Combine random value & displaying image that matches
+  rollDie(){
+    this.rollResult = this.rollValue();
+    this.displayDie();
+  }
+
+  /////// Note: this really belong in another class
+  
+  // Random value for the dice assigned to object
+  rollValue() {
+    return Math.floor(Math.random() * this.sides) + 1; 
+  }
   displayDie() {
     // Display result of roll on screen
     var dieDOM = document.querySelector('.' + this.imageName + this.dieID);
     dieDOM.style.display = 'block';
     dieDOM.src = this.imageName + this.rollResult + '.png';
   }
-  // Random value for the dice assigned to object
-  rollValue() {
-    return Math.floor(Math.random() * this.sides) + 1; 
-  }
-  // Combine random value & displaying image that matches
-  rollDie(){
-    this.rollResult = this.rollValue();
-    this.displayDie();
-  }
+
+
   // Hide die image
   hideDie() {
     document.querySelector('.' + this.imageName + this.dieID).style.display = 'none';
