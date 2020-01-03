@@ -114,32 +114,22 @@ class Players {
   nextPlayer(player = this.activePlayer){
     this.previousPlayer = this.activePlayer;
     players = this.players;
+    var order;
 
 
     var determineOrder = function(){
-      // var player = this.players[this.activePlayer.id]
-      console.log('nextplayer first')
-      console.log(player);
-      console.log('Players [] length ... ' + (players.length - 1))
-        // Check we aren't at the squential order end, offset by one since array starts at 0
+        // Check we aren't at the order end, offset by one since array starts at 0
+        // replace this ordinal style with array holding any other order desired
         if (player.id < players.length - 1){
-          determineOrder = (player.id) + 1;
-          console.log('firing true')
+          // increment by one if not at end for squential order
+          order = (player.id) + 1;
         } else{
-          console.log('firing false')
-          determineOrder = 0;
+          order = 0;
         }
-      console.log('Determine Order is ... ' + determineOrder);
-      console.log('making new active')
-      console.log(players)
-      console.log(players[determineOrder])
-      return determineOrder;
-    }
-    
+      return order;
+    }    
+    console.log(determineOrder())
     this.activePlayer = this.players[determineOrder()];
-    console.log("New active player ... ")
-    console.log(this.activePlayer)
-    console.log(this.previousPlayer)
   }
 }
 
@@ -160,7 +150,7 @@ class WinCondition {
   }
   checkWin(player = players.activePlayer, victory = this.winValue){
     // console.log('in checkwin ... player is ')
-    console.log(player)
+    // console.log(player)
     return player.score >= victory;
   }
 }
@@ -262,10 +252,6 @@ function nextTurn(){
       // html zero out current round scores
       // hide/fade out dice
 
-  // update board to new roller
-
-  // scoreboard.activePlayer 
-  // activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
   roundScore = 0;
 
   document.getElementById('current-0').textContent = '0';
