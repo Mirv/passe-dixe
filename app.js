@@ -104,8 +104,6 @@ class Players {
     this.players = [];
     this.addPlayer(numPlayers);
     this.activePlayer = this.players[0];
-    console.log('players' )
-    console.log(this.activePlayer)
     this.previousPlayer;
   }
   addPlayer(howMany = 1){
@@ -113,22 +111,35 @@ class Players {
       this.players.push(new Player(this.players.length));
     }
   }
-  nextPlayer(){
-    var determineOrder = function(){
-      console.log(this.activePlayer)
-      // Check we aren't at the end, offset by one since array starts at 0
-      if (this.activePlayer.id <= this.players.length - 1){
-        return(this.activePlayer.id) + 1;
-      } else{
-        return 0;
-      }
-    } 
-    console.log('Determine Order is ... ' + determineOrder() )
-    // this.previousPlayer = this.activePlayer;
-    // this.activePlayer = this.players[determineOrder];
-    // Expect some games I make to have different order,
-    // allowing for order to change & restart if at end
+  nextPlayer(player = this.activePlayer){
+    this.previousPlayer = this.activePlayer;
+    players = this.players;
 
+
+    var determineOrder = function(){
+      // var player = this.players[this.activePlayer.id]
+      console.log('nextplayer first')
+      console.log(player);
+      console.log('Players [] length ... ' + (players.length - 1))
+        // Check we aren't at the squential order end, offset by one since array starts at 0
+        if (player.id < players.length - 1){
+          determineOrder = (player.id) + 1;
+          console.log('firing true')
+        } else{
+          console.log('firing false')
+          determineOrder = 0;
+        }
+      console.log('Determine Order is ... ' + determineOrder);
+      console.log('making new active')
+      console.log(players)
+      console.log(players[determineOrder])
+      return determineOrder;
+    }
+    
+    this.activePlayer = this.players[determineOrder()];
+    console.log("New active player ... ")
+    console.log(this.activePlayer)
+    console.log(this.previousPlayer)
   }
 }
 
@@ -138,7 +149,7 @@ class WinCondition {
     this.inputName = inputName;
     this.winDOM; // can't set to dom object till full load?
     this.setListener('blur');
-    console.log('WinCondition ' + this.winValue)
+    // console.log('WinCondition ' + this.winValue)
   }
   setWinCondition(targetDom = "win-condition"){
     this.winValue = document.getElementById("win-condition").value;
@@ -148,7 +159,7 @@ class WinCondition {
     document.getElementById(target).addEventListener(actionType, this.setWinCondition);
   }
   checkWin(player = players.activePlayer, victory = this.winValue){
-    console.log('in checkwin ... player is ')
+    // console.log('in checkwin ... player is ')
     console.log(player)
     return player.score >= victory;
   }
@@ -203,7 +214,7 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
 
       // Two ones
       if (dice.countValues(1) > 1){
-        players.activePlayer.updateScore(0);
+        // players.activePlayer.updateScore(0);
       }
 
       // next player - as a 1 means end of turn
@@ -222,8 +233,8 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
 // Hold method
 document.querySelector('.btn-hold').addEventListener('click', function(){
   if(gamePlaying){
-    console.log('holding')
-    console.log(players.active)
+    // console.log('holding')
+    // console.log(players.activePlayer)
     // players.active.proccessScore(roundScore);
     // check if game is won
     if(scoreboard.victory.checkWin()){
@@ -242,12 +253,19 @@ document.querySelector('.btn-hold').addEventListener('click', function(){
 
 
 function nextTurn(){
-
+  // Process - 
+    // call save current player to previous
+    // call for new activeplayer
+    // change display ...
+      // to reflect current player toggling off & new active on in css
+      // zero round score
+      // html zero out current round scores
+      // hide/fade out dice
 
   // update board to new roller
 
-  scoreboard.activePlayer 
-  activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
+  // scoreboard.activePlayer 
+  // activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
   roundScore = 0;
 
   document.getElementById('current-0').textContent = '0';
@@ -259,7 +277,7 @@ function nextTurn(){
   document.querySelector('.player-1-panel').classList.toggle('active');
 
   // next player now that board is updated
-  nextPlayer = players.nextPlayer();
+  players.nextPlayer();
   dice.hideDice();
 }
 
@@ -269,7 +287,7 @@ document.querySelector('.btn-new').addEventListener('click', init);
 function init(){
   // initialize game values
   scores = [0,0];
-  activePlayer = 0;
+  // activePlayer = 0;
   roundScore = 0;
   gamePlaying = true;
 
