@@ -111,9 +111,12 @@ class Players {
       this.players.push(new Player(this.players.length));
     }
   }
-  nextPlayer(player = this.activePlayer){
+  nextPlayer(player = this.activePlayer, players = this.players){
+    console.log('------------')
+    console.log('Next Player ')
+    console.log(this.previousPlayer)
     this.previousPlayer = this.activePlayer;
-    players = this.players;
+    console.log(this.previousPlayer)
     var order;
 
 
@@ -128,7 +131,6 @@ class Players {
         }
       return order;
     }    
-    console.log(determineOrder())
     this.activePlayer = this.players[determineOrder()];
   }
 }
@@ -139,7 +141,6 @@ class WinCondition {
     this.inputName = inputName;
     this.winDOM; // can't set to dom object till full load?
     this.setListener('blur');
-    // console.log('WinCondition ' + this.winValue)
   }
   setWinCondition(targetDom = "win-condition"){
     this.winValue = document.getElementById("win-condition").value;
@@ -149,8 +150,6 @@ class WinCondition {
     document.getElementById(target).addEventListener(actionType, this.setWinCondition);
   }
   checkWin(player = players.activePlayer, victory = this.winValue){
-    // console.log('in checkwin ... player is ')
-    // console.log(player)
     return player.score >= victory;
   }
 }
@@ -224,7 +223,7 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
 document.querySelector('.btn-hold').addEventListener('click', function(){
   if(gamePlaying){
     // console.log('holding')
-    // console.log(players.activePlayer)
+    console.log(players.activePlayer)
     // players.active.proccessScore(roundScore);
     // check if game is won
     if(scoreboard.victory.checkWin()){
