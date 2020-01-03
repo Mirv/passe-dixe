@@ -14,7 +14,6 @@ Double dice
 
 */
 
-
 //////////////////////////////////////////////////
 // Single form of dice
 //
@@ -49,7 +48,6 @@ class TheDie {
     document.querySelector('.' + this.imageName + this.dieID).style.display = 'none';
   }
 }
-
 
 ////////////////
 //  Dice(plural)
@@ -95,7 +93,7 @@ class Player {
     this.updatePlayerScore((roundScore + this.score));
   }
   updatePlayerScore(score){
-    this.score = score;
+    players.activePlayer.score = score;
   }
 }
 
@@ -112,13 +110,10 @@ class Players {
     }
   }
   nextPlayer(player = this.activePlayer, players = this.players){
+    var order;
     console.log('------------')
     console.log('Next Player ')
-    console.log(this.previousPlayer)
     this.previousPlayer = this.activePlayer;
-    console.log(this.previousPlayer)
-    var order;
-
 
     var determineOrder = function(){
         // Check we aren't at the order end, offset by one since array starts at 0
@@ -142,15 +137,15 @@ class WinCondition {
     this.winDOM; // can't set to dom object till full load?
     this.setListener('blur');
   }
-  setWinCondition(targetDom = "win-condition"){
-    this.winValue = document.getElementById("win-condition").value;
+  setWinCondition(){
+    scoreboard.victory.winValue = document.getElementById("win-condition").value;
   }
   // As separate function so we can link to it for "pressing enter" or other times when blur isn't working
   setListener(actionType = 'blur', target = "win-condition"){
     document.getElementById(target).addEventListener(actionType, this.setWinCondition);
   }
-  checkWin(player = players.activePlayer, victory = this.winValue){
-    return player.score >= victory;
+  checkWin(){
+    return players.activePlayer.score >= this.winValue;
   }
 }
 
@@ -165,8 +160,8 @@ class ScoreBoard {
     this.roundScore = 0;
     this.victory = win;
   }
-  displayPlayerScore(player = players.player){
-    document.querySelector('#score-' + player.id).textContent = player.score;
+  displayPlayerScore(current = players.activePlayer){
+    document.querySelector('#score-' + current.id).textContent = current.score;
   }
   updateActivePlayer(current = players.activePlayer, next = players.previousPlayer){
     toggleActiveStatus(current);
@@ -175,7 +170,7 @@ class ScoreBoard {
 
 }
 
-var scores, roundScore;
+var roundScore;
 var dice = new TheDice(2);
 var scoreboard = new ScoreBoard();
 var players = new Players();
@@ -203,16 +198,15 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
 
       // Two ones
       if (dice.countValues(1) > 1){
-        // players.activePlayer.updateScore(0);
+        players.activePlayer.updatePlayerScore(0);
       }
 
       // next player - as a 1 means end of turn
-      // players.nextPlayer();
+      nextTurn();
 
     } else {
       // add score
       roundScore += dice.diceTotal();
-
       document.querySelector('#current-' + players.activePlayer.id).textContent = roundScore;
     }
 
@@ -222,19 +216,26 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
 // Hold method
 document.querySelector('.btn-hold').addEventListener('click', function(){
   if(gamePlaying){
-    // console.log('holding')
+    console.log('-------------')
+    console.log('holding')
     console.log(players.activePlayer)
-    // players.active.proccessScore(roundScore);
+
     // check if game is won
     if(scoreboard.victory.checkWin()){
+      console.log('-------------')
+      console.log('Calling - check Win')
       document.querySelector('#name-' + players.activePlayer.id).textContent = 'Winner';
       dice.hideDice();
       document.querySelector('.player-' + players.activePlayer.id + '-panel').classList.add('winner');
       document.querySelector('.player-' + players.activePlayer.id + '-panel').classList.remove('active');
       gamePlaying = false;
     } else {
-      // next player
-      nextTurn(dice);
+      // call to players active field to record round score
+      players.activePlayer.proccessScore(roundScore);
+      // reflect on scoreboard
+      scoreboard.displayPlayerScore();
+      // round/turn cleanup & call next player 
+      nextTurn();
     }
   }
 });
