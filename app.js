@@ -14,134 +14,11 @@ Double dice
 
 */
 
-var scores, roundScore, activePlayer, winCondition = 100;
-var dice = new TheDice();
-dice.addDice(2);
-dice.hideDice();
-
-init();
-
-
-//////////////////////////
-// Rules implementation //
-//////////////////////////
-
-// Roll method being attached to button
-// example of anonymous function, one without name
-document.querySelector('.btn-roll').addEventListener('click', function(){
-
-  // if active game
-  if(gamePlaying){
-
-    // roll dice
-    dice.rollDice();
-
-    // update the round score IF rolled number was NOT a 1
-    // A single one 
-    if (dice.countValues(1) > 0){ 
-
-      // Two ones
-      if (dice.countValues(1) > 1){
-        setPlayerScore(0);
-      }
-
-      // next player - as a 1 means end of turn
-      nextPlayer();
-
-    } else {
-      // add score
-      roundScore += dice.diceTotal();
-      document.querySelector('#current-' + activePlayer).textContent = roundScore;
-    }
-
-  }
-});
-
-// Hold method
-document.querySelector('.btn-hold').addEventListener('click', function(){
-  if(gamePlaying){
-    setPlayerScore(scores[activePlayer] + roundScore);
-
-    // check if game is won
-    if(scores[activePlayer] >= winCondition){
-      document.querySelector('#name-' + activePlayer).textContent = 'Winner';
-      dice.hideDice();
-      document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
-      document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
-      gamePlaying = false;
-    } else {
-      // next player
-      nextPlayer(dice);
-    }
-  }
-});
-
-function setPlayerScore(gameScore){
-  scores[activePlayer] = gameScore;
-  document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
-}
-
-// Set win condition number other than 100
-document.querySelector('#win-condition').addEventListener('blur', setWinCondition);
-
-// As separate function so we can link to it for "pressing enter" or other times when blur isn't working
-function setWinCondition(){
-    winCondition = document.getElementById("win-condition").value;
-}
-
-function nextPlayer(){
-  // next player
-  activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
-  roundScore = 0;
-
-  document.getElementById('current-0').textContent = '0';
-  document.getElementById('current-1').textContent = '0';
-
-  document.querySelector('.player-0-panel').classList.toggle('active');
-  document.querySelector('.player-1-panel').classList.toggle('active');
-
-  dice.hideDice();
-}
-
-// Start a new game
-document.querySelector('.btn-new').addEventListener('click', init);
-
-function init(){
-  // initialize game values
-  scores = [0,0];
-  activePlayer = 0;
-  roundScore = 0;
-  gamePlaying = true;
-
-  // set winning total
-  document.getElementById('win-condition').value = winCondition;
-
-  dice.hideDice();
-
-  // zero displays of scores & dice rolls
-  document.getElementById('score-0').textContent = '0';
-  document.getElementById('score-1').textContent = '0';
-  document.getElementById('current-0').textContent = '0';
-  document.getElementById('current-1').textContent = '0';
-
-  // names
-  document.getElementById('name-0').textContent = 'Player 1';
-  document.getElementById('name-1').textContent = 'Player 2';
-
-  // fire proofing winner & active player from state bugs
-  document.querySelector('.player-0-panel').classList.remove('winner');
-  document.querySelector('.player-1-panel').classList.remove('winner');
-  document.querySelector('.player-0-panel').classList.remove('active');
-  document.querySelector('.player-1-panel').classList.remove('active');
-  document.querySelector('.player-0-panel').classList.add('active');
-}
-
-
-
-///////////////////////
+//////////////////////////////////////////////////
 // Single form of dice
 //
-// Holds values, calls to manipulate the dice dom visually
+// Holds values, calls to manipulate the dom 
+//
 class TheDie {
   constructor(die = 1, sides = 6, imageName = 'dice-') {
     this.dieID = die;   // ID
@@ -172,18 +49,18 @@ class TheDie {
   }
 }
 
-
 ////////////////
 //  Dice(plural)
 //
 //  Composes individual die
 //
 class TheDice {
-  constructor(){
+  constructor(howMany){
     this.dice = [];
+    this.addDice(howMany);
   }
   addDice(number = 1) {
-    for(var i = 1; i <= number; i++){
+    for(var i = 0; i < number; i++){
       this.dice.push(new TheDie(this.dice.length + 1));
     }
   }
@@ -205,3 +82,221 @@ class TheDice {
     this.dice.forEach(aDie => aDie.hideDie());
   }
 }
+
+class Player {
+  constructor(id = 0, score = 0){
+    this.id = id;
+    this.score = score;
+    this.name = "Player " + this.id;
+  }
+  proccessScore(roundScore){
+    this.updatePlayerScore((roundScore + this.score));
+  }
+  updatePlayerScore(score){
+    players.activePlayer.score = score;
+  }
+}
+
+class Players {
+  constructor(numPlayers = 2){
+    this.players = [];
+    this.addPlayer(numPlayers);
+    this.activePlayer = this.players[0];
+    this.previousPlayer;
+  }
+  addPlayer(howMany = 1){
+    for(var i = 0; i < howMany; i++){
+      this.players.push(new Player(this.players.length));
+    }
+  }
+  nextPlayer(player = this.activePlayer, players = this.players){
+    var order;
+    console.log('------------')
+    console.log('Next Player ')
+    this.previousPlayer = this.activePlayer;
+
+    var determineOrder = function(){
+        // Check we aren't at the order end, offset by one since array starts at 0
+        // replace this ordinal style with array holding any other order desired
+        if (player.id < players.length - 1){
+          // increment by one if not at end for squential order
+          order = (player.id) + 1;
+        } else{
+          order = 0;
+        }
+      return order;
+    }    
+    this.activePlayer = this.players[determineOrder()];
+  }
+}
+
+class WinCondition {
+  constructor(winValue = 50, inputName = "win-condition"){
+    this.winValue = winValue;
+    this.inputName = inputName;
+    this.winDOM; // can't set to dom object till full load?
+    this.setListener('blur');
+  }
+  setWinCondition(){
+    scoreboard.victory.winValue = document.getElementById("win-condition").value;
+  }
+  // As separate function so we can link to it for "pressing enter" or other times when blur isn't working
+  setListener(actionType = 'blur', target = "win-condition"){
+    document.getElementById(target).addEventListener(actionType, this.setWinCondition);
+  }
+  checkWin(){
+    return players.activePlayer.score >= this.winValue;
+  }
+}
+
+//////////////////
+//
+//  Scoreboard
+//
+//  Should handle displaying status for scores
+//
+class ScoreBoard {
+  constructor(win = new WinCondition){
+    this.roundScore = 0;
+    this.victory = win;
+  }
+  displayPlayerScore(current = players.activePlayer){
+    document.querySelector('#score-' + current.id).textContent = current.score;
+  }
+  updateActivePlayer(current = players.activePlayer, next = players.previousPlayer){
+    toggleActiveStatus(current);
+    toggleActiveStatus(next);
+  }
+
+}
+
+var roundScore;
+var dice = new TheDice(2);
+var scoreboard = new ScoreBoard();
+var players = new Players();
+
+init();
+
+
+//////////////////////////
+// Rules implementation //
+//////////////////////////
+
+// Roll method being attached to button
+// example of anonymous function, one without name
+document.querySelector('.btn-roll').addEventListener('click', function(){
+
+  // if active game
+  if(gamePlaying){
+
+    // roll dice
+    dice.rollDice();
+
+    // update the round score IF rolled number was NOT a 1
+    // A single one 
+    if (dice.countValues(1) > 0){ 
+
+      // Two ones
+      if (dice.countValues(1) > 1){
+        players.activePlayer.updatePlayerScore(0);
+      }
+
+      // next player - as a 1 means end of turn
+      nextTurn();
+
+    } else {
+      // add score
+      roundScore += dice.diceTotal();
+      document.querySelector('#current-' + players.activePlayer.id).textContent = roundScore;
+    }
+
+  }
+});
+
+// Hold method
+document.querySelector('.btn-hold').addEventListener('click', function(){
+  if(gamePlaying){
+    console.log('-------------')
+    console.log('holding')
+    console.log(players.activePlayer)
+
+    // check if game is won
+    if(scoreboard.victory.checkWin()){
+      console.log('-------------')
+      console.log('Calling - check Win')
+      document.querySelector('#name-' + players.activePlayer.id).textContent = 'Winner';
+      dice.hideDice();
+      document.querySelector('.player-' + players.activePlayer.id + '-panel').classList.add('winner');
+      document.querySelector('.player-' + players.activePlayer.id + '-panel').classList.remove('active');
+      gamePlaying = false;
+    } else {
+      // call to players active field to record round score
+      players.activePlayer.proccessScore(roundScore);
+      // reflect on scoreboard
+      scoreboard.displayPlayerScore();
+      // round/turn cleanup & call next player 
+      nextTurn();
+    }
+  }
+});
+
+
+
+function nextTurn(){
+  // Process - 
+    // call save current player to previous
+    // call for new activeplayer
+    // change display ...
+      // to reflect current player toggling off & new active on in css
+      // zero round score
+      // html zero out current round scores
+      // hide/fade out dice
+
+  roundScore = 0;
+
+  document.getElementById('current-0').textContent = '0';
+  document.getElementById('current-1').textContent = '0';
+
+  // can't toggle or we need to current / next player toggle via array in players
+  // careful to random
+  document.querySelector('.player-0-panel').classList.toggle('active');
+  document.querySelector('.player-1-panel').classList.toggle('active');
+
+  // next player now that board is updated
+  players.nextPlayer();
+  dice.hideDice();
+}
+
+// Start a new game
+document.querySelector('.btn-new').addEventListener('click', init);
+
+function init(){
+  // initialize game values
+  scores = [0,0];
+  // activePlayer = 0;
+  roundScore = 0;
+  gamePlaying = true;
+
+  // set winning total
+  document.getElementById('win-condition').value = scoreboard.victory.winValue;
+
+  dice.hideDice();
+
+  // zero displays of scores & dice rolls
+  document.getElementById('score-0').textContent = '0';
+  document.getElementById('score-1').textContent = '0';
+  document.getElementById('current-0').textContent = '0';
+  document.getElementById('current-1').textContent = '0';
+
+  // names
+  document.getElementById('name-0').textContent = 'Player 1';
+  document.getElementById('name-1').textContent = 'Player 2';
+
+  // fire proofing winner & active player from state bugs
+  document.querySelector('.player-0-panel').classList.remove('winner');
+  document.querySelector('.player-1-panel').classList.remove('winner');
+  document.querySelector('.player-0-panel').classList.remove('active');
+  document.querySelector('.player-1-panel').classList.remove('active');
+  document.querySelector('.player-0-panel').classList.add('active');
+}
+
